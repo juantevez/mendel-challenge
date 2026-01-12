@@ -5,7 +5,26 @@ spring:
   application:
     name: mendel-challenge
 
+  # Configuración de Redis (opcional)
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+# Configuración custom de Redis (si prefieres usar properties custom)
+redis:
+  host: ${REDIS_HOST:localhost}
+  port: ${REDIS_PORT:6379}
+
 logging:
   level:
     com.mendel: DEBUG
+    org.springframework.data.redis: INFO
 

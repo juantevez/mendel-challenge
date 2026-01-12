@@ -7,7 +7,6 @@ import com.mendel.challenge.domain.port.in.GetTransactionSumUseCase;
 import com.mendel.challenge.domain.port.in.GetTransactionsByTypeUseCase;
 import com.mendel.challenge.domain.port.out.TransactionRepository;
 import com.mendel.challenge.infrastructure.factory.TransactionRepositoryFactory;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

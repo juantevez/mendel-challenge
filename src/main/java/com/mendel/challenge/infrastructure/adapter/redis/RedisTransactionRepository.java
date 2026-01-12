@@ -5,17 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mendel.challenge.domain.model.Transaction;
 import com.mendel.challenge.domain.port.out.TransactionRepository;
+import com.mendel.challenge.infrastructure.adapter.redis.dto.TransactionRedisDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository("redisRepository")
+@ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedisTransactionRepository implements TransactionRepository {
+
+    private static final Logger log = LoggerFactory.getLogger(RedisTransactionRepository.class);
 
     private static final String TRANSACTION_KEY_PREFIX = "transaction:";
     private static final String TYPE_INDEX_PREFIX = "type:";
@@ -28,6 +32,7 @@ public class RedisTransactionRepository implements TransactionRepository {
         this.redisTemplate = redisTemplate;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
+        log.info("Redis Transaction Repository initialized");
     }
 
     @Override
@@ -35,19 +40,17 @@ public class RedisTransactionRepository implements TransactionRepository {
         String key = getTransactionKey(transaction.getId());
         String json = serializeTransaction(transaction);
 
-        // Guardar la transacción
         redisTemplate.opsForValue().set(key, json);
 
-        // Actualizar índice por tipo
         String typeKey = getTypeKey(transaction.getType());
         redisTemplate.opsForSet().add(typeKey, transaction.getId().toString());
 
-        // Actualizar índice de hijos si tiene parent
         if (transaction.hasParent()) {
             String childrenKey = getChildrenKey(transaction.getParentId());
             redisTemplate.opsForSet().add(childrenKey, transaction.getId().toString());
         }
 
+        log.debug("Saved transaction {} to Redis", transaction.getId());
         return transaction;
     }
 
@@ -57,10 +60,13 @@ public class RedisTransactionRepository implements TransactionRepository {
         String json = redisTemplate.opsForValue().get(key);
 
         if (json == null) {
+            log.debug("Transaction {} not found in Redis", id);
             return Optional.empty();
         }
 
-        return Optional.of(deserializeTransaction(json));
+        Transaction transaction = deserializeTransaction(json);
+        log.debug("Found transaction {} in Redis", id);
+        return Optional.of(transaction);
     }
 
     @Override
@@ -69,15 +75,19 @@ public class RedisTransactionRepository implements TransactionRepository {
         Set<String> ids = redisTemplate.opsForSet().members(typeKey);
 
         if (ids == null || ids.isEmpty()) {
+            log.debug("No transactions found for type {} in Redis", type);
             return Collections.emptyList();
         }
 
-        return ids.stream()
+        List<Transaction> transactions = ids.stream()
                 .map(Long::parseLong)
                 .map(this::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+
+        log.debug("Found {} transactions for type {} in Redis", transactions.size(), type);
+        return transactions;
     }
 
     @Override
@@ -86,21 +96,26 @@ public class RedisTransactionRepository implements TransactionRepository {
         Set<String> childIds = redisTemplate.opsForSet().members(childrenKey);
 
         if (childIds == null || childIds.isEmpty()) {
+            log.debug("No children found for parent {} in Redis", parentId);
             return Collections.emptyList();
         }
 
-        return childIds.stream()
+        List<Transaction> children = childIds.stream()
                 .map(Long::parseLong)
                 .map(this::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+
+        log.debug("Found {} children for parent {} in Redis", children.size(), parentId);
+        return children;
     }
 
     @Override
     public boolean existsById(Long id) {
         String key = getTransactionKey(id);
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+        Boolean exists = redisTemplate.hasKey(key);
+        return Boolean.TRUE.equals(exists);
     }
 
     @Override
@@ -123,19 +138,26 @@ public class RedisTransactionRepository implements TransactionRepository {
 
     private String serializeTransaction(Transaction transaction) {
         try {
-            return objectMapper.writeValueAsString(transaction);
+            TransactionRedisDTO dto = TransactionRedisDTO.fromDomain(transaction);
+            String json = objectMapper.writeValueAsString(dto);
+            log.trace("Serialized transaction {}: {}", transaction.getId(), json);
+            return json;
         } catch (JsonProcessingException e) {
+            log.error("Error serializing transaction {}", transaction.getId(), e);
             throw new RuntimeException("Error serializing transaction", e);
         }
     }
 
     private Transaction deserializeTransaction(String json) {
         try {
-            return objectMapper.readValue(json, Transaction.class);
+            log.trace("Deserializing transaction: {}", json);
+            TransactionRedisDTO dto = objectMapper.readValue(json, TransactionRedisDTO.class);
+            Transaction transaction = dto.toDomain();
+            log.trace("Deserialized transaction {}", transaction.getId());
+            return transaction;
         } catch (JsonProcessingException e) {
+            log.error("Error deserializing transaction from JSON: {}", json, e);
             throw new RuntimeException("Error deserializing transaction", e);
         }
     }
-
-
 }
