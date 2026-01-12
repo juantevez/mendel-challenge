@@ -1,0 +1,850 @@
+{
+  "info": {
+    "name": "Mendel Challenge - Transaction Service",
+    "_postman_id": "mendel-challenge-collection",
+    "description": "Collection para probar el servicio de transacciones con almacenamiento IN_MEMORY y REDIS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. IN_MEMORY Tests",
+      "item": [
+        {
+          "name": "Create Transaction - Cars (Parent)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"cars\",\n  \"amount\": 5000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/10?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "10"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Shopping (Parent)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"shopping\",\n  \"amount\": 3000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/11?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "11"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Maintenance (Child of Cars)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"maintenance\",\n  \"amount\": 1000.00,\n  \"parentId\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/12?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "12"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Fuel (Child of Cars)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"fuel\",\n  \"amount\": 500.00,\n  \"parentId\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/13?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "13"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Tires (Grandchild)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"tires\",\n  \"amount\": 200.00,\n  \"parentId\": 12\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/14?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "14"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transactions by Type - Cars",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/types/cars?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "types", "cars"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transactions by Type - Maintenance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/types/maintenance?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "types", "maintenance"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sum - Cars (with all children)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/10?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "10"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sum - Maintenance (with grandchildren)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/12?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "12"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. REDIS Tests",
+      "item": [
+        {
+          "name": "Create Transaction - Electronics (Parent)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"electronics\",\n  \"amount\": 10000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/20?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "20"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Laptop (Child)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"laptop\",\n  \"amount\": 8000.00,\n  \"parentId\": 20\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/21?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "21"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Phone (Child)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"phone\",\n  \"amount\": 2000.00,\n  \"parentId\": 20\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/22?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "22"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Accessories (Grandchild)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"accessories\",\n  \"amount\": 500.00,\n  \"parentId\": 21\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/23?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "23"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transactions by Type - Electronics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/types/electronics?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "types", "electronics"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transactions by Type - Laptop",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/types/laptop?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "types", "laptop"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sum - Electronics (all hierarchy)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/20?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "20"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sum - Laptop (with accessories)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/21?storage=redis",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "21"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "redis"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Error Cases",
+      "item": [
+        {
+          "name": "Create Transaction - Duplicate ID",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"duplicate\",\n  \"amount\": 1000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/10?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "10"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Invalid Parent",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"orphan\",\n  \"amount\": 500.00,\n  \"parentId\": 9999\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/99?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "99"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Negative Amount",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"invalid\",\n  \"amount\": -100.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/98?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "98"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaction - Missing Type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/97?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "97"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sum - Non-existent Transaction",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/9999?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "9999"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Types - Non-existent Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/types/nonexistent?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "types", "nonexistent"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Storage Strategy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"test\",\n  \"amount\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/96?storage=invalid",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "96"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "invalid"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Default Storage (no param)",
+      "item": [
+        {
+          "name": "Create Transaction - Default Storage",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"default\",\n  \"amount\": 1500.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/30",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "30"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Types - Default Storage",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/types/default",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "types", "default"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sum - Default Storage",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/30",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "30"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Complex Hierarchy Test",
+      "item": [
+        {
+          "name": "Step 1 - Create Root",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"project\",\n  \"amount\": 10000.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/100?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "100"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 2 - Create Level 1 Child A",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"development\",\n  \"amount\": 5000.00,\n  \"parentId\": 100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/101?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "101"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 3 - Create Level 1 Child B",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"testing\",\n  \"amount\": 3000.00,\n  \"parentId\": 100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/102?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "102"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 4 - Create Level 2 Grandchild",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"frontend\",\n  \"amount\": 2000.00,\n  \"parentId\": 101\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/103?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "103"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 5 - Create Level 3 Great-grandchild",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"react-components\",\n  \"amount\": 1000.00,\n  \"parentId\": 103\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/transactionservice/transaction/104?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "transaction", "104"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 6 - Get Root Sum (should be 21000)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/100?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "100"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Step 7 - Get Development Sum (should be 8000)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/transactionservice/sum/101?storage=memory",
+              "host": ["{{base_url}}"],
+              "path": ["transactionservice", "sum", "101"],
+              "query": [
+                {
+                  "key": "storage",
+                  "value": "memory"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ]
+}

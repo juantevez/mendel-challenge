@@ -1,0 +1,55 @@
+services:
+  # Servicio de Redis
+  redis:
+    image: redis:7-alpine
+    container_name: mendel-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - mendel-network
+    restart: unless-stopped
+
+  # Servicio de la aplicación Spring Boot
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mendel-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Configuración de Redis
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      
+      # Habilitar Redis
+      REDIS_ENABLED: "true"
+      
+      # Configuración de logging
+      LOGGING_LEVEL_COM_MENDEL: DEBUG
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_REDIS: INFO
+      
+      # Profile activo
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - mendel-network
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  mendel-network:
+    driver: bridge
