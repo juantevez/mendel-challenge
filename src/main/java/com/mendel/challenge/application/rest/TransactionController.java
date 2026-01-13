@@ -3,6 +3,7 @@ package com.mendel.challenge.application.rest;
 import com.mendel.challenge.application.dto.SumResponse;
 import com.mendel.challenge.application.dto.TransactionRequest;
 import com.mendel.challenge.application.dto.TransactionResponse;
+import com.mendel.challenge.application.dto.TypeTransactionsResponse;
 import com.mendel.challenge.domain.model.StorageStrategy;
 import com.mendel.challenge.domain.model.Transaction;
 import com.mendel.challenge.domain.service.TransactionService;
@@ -51,7 +52,7 @@ public class TransactionController {
     }
 
     @GetMapping("/types/{type}")
-    public ResponseEntity<List<Long>> getTransactionsByType(
+    public ResponseEntity<TypeTransactionsResponse> getTransactionsByType(
             @PathVariable String type,
             @RequestParam(value = "storage", defaultValue = "memory") String storage) {
 
@@ -62,7 +63,13 @@ public class TransactionController {
                 .map(Transaction::getId)
                 .toList();
 
-        return ResponseEntity.ok(transactionIds);
+        TypeTransactionsResponse response = TypeTransactionsResponse.of(
+                type,
+                transactionIds,
+                strategy.getValue()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/sum/{transaction_id}")

@@ -1,0 +1,21 @@
+server:
+  port: 0  # Random port
+
+spring:
+  application:
+    name: mendel-challenge-test
+
+  data:
+    redis:
+      # Testcontainers configurará esto automáticamente
+      timeout: 2000ms
+
+redis:
+  enabled: true
+
+logging:
+  level:
+    com.mendel: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.testcontainers: INFO
+
