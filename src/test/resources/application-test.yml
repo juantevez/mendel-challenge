@@ -7,7 +7,6 @@ spring:
 
   data:
     redis:
-      # Testcontainers configurará esto automáticamente
       timeout: 2000ms
 
 redis:

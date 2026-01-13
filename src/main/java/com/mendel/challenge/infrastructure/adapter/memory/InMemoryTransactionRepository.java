@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 @Repository("inMemoryRepository")
 public class InMemoryTransactionRepository implements TransactionRepository {
 
-    // Almacenamiento simple sin thread-safety
     private final Map<Long, Transaction> transactions = new HashMap<>();
     private final Map<String, Set<Long>> typeIndex = new HashMap<>();
     private final Map<Long, Set<Long>> childrenIndex = new HashMap<>();
@@ -19,11 +18,9 @@ public class InMemoryTransactionRepository implements TransactionRepository {
     public Transaction save(Transaction transaction) {
         transactions.put(transaction.getId(), transaction);
 
-        // Actualizar índice de tipo
         typeIndex.computeIfAbsent(transaction.getType(), k -> new HashSet<>())
                 .add(transaction.getId());
 
-        // Actualizar índice de hijos
         if (transaction.hasParent()) {
             childrenIndex.computeIfAbsent(transaction.getParentId(), k -> new HashSet<>())
                     .add(transaction.getId());

@@ -123,7 +123,6 @@ public class RedisTransactionRepository implements TransactionRepository {
         return "REDIS";
     }
 
-    // Helper methods
     private String getTransactionKey(Long id) {
         return TRANSACTION_KEY_PREFIX + id;
     }

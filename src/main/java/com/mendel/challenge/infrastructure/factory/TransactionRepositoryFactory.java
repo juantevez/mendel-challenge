@@ -18,7 +18,6 @@ public class TransactionRepositoryFactory {
     private final TransactionRepository redisRepository;
     private final boolean redisAvailable;
 
-    // Constructor único - Spring lo usa automáticamente
     public TransactionRepositoryFactory(
             @Qualifier("inMemoryRepository") TransactionRepository inMemoryRepository,
             @Qualifier("redisRepository") Optional<TransactionRepository> redisRepository) {

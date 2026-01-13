@@ -71,19 +71,19 @@ test-all: ## Ejecutar todos los tests
 
 test-coverage: ## Ejecutar tests unitarios con coverage (excluyendo integration y performance)
 	$(MVN) clean test jacoco:report -P unit-tests
-	@echo "✅ Coverage report (unit tests only): target/site/jacoco/index.html"
+	@echo "Coverage report (unit tests only): target/site/jacoco/index.html"
 
 test-coverage-integration: ## Ejecutar tests de integración con coverage
 	$(MVN) clean test jacoco:report -P integration-tests
-	@echo "✅ Coverage report (integration tests): target/site/jacoco/index.html"
+	@echo "Coverage report (integration tests): target/site/jacoco/index.html"
 
 test-coverage-all: ## Ejecutar todos los tests con coverage (unit + integration + performance)
 	$(MVN) clean test jacoco:report -P all-tests
-	@echo "✅ Coverage report (all tests): target/site/jacoco/index.html"
+	@echo "Coverage report (all tests): target/site/jacoco/index.html"
 
 test-coverage-fast: ## Coverage solo de unitarios sin limpiar (más rápido)
 	$(MVN) test jacoco:report -P unit-tests
-	@echo "✅ Coverage report: target/site/jacoco/index.html"
+	@echo "Coverage report: target/site/jacoco/index.html"
 
 test-performance: ## Ejecutar tests de performance
 	$(MVN) test -Dtest=TransactionRepositoryPerformanceTest
