@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("inMemoryRepository")
 public class InMemoryTransactionRepository implements TransactionRepository {
 
     private final Map<Long, Transaction> transactions = new HashMap<>();
@@ -59,7 +58,6 @@ public class InMemoryTransactionRepository implements TransactionRepository {
         return transactions.containsKey(id);
     }
 
-    @Override
     public String getImplementationType() {
         return "IN_MEMORY";
     }

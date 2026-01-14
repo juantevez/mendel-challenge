@@ -65,7 +65,6 @@ class RedisTransactionRepositoryTest {
 
             // Then
             assertThat(newRepository).isNotNull();
-            assertThat(newRepository.getImplementationType()).isEqualTo("REDIS");
         }
     }
 
@@ -537,21 +536,6 @@ class RedisTransactionRepositoryTest {
 
             // Then
             assertThat(result).isFalse();
-        }
-    }
-
-    @Nested
-    @DisplayName("Get Implementation Type Tests")
-    class GetImplementationTypeTests {
-
-        @Test
-        @DisplayName("Should return REDIS as implementation type")
-        void shouldReturnRedisAsImplementationType() {
-            // When
-            String implementationType = repository.getImplementationType();
-
-            // Then
-            assertThat(implementationType).isEqualTo("REDIS");
         }
     }
 

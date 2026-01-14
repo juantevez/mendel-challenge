@@ -6,4 +6,3 @@ import java.math.BigDecimal;
 public interface GetTransactionSumUseCase {
     BigDecimal calculateSum(Long transactionId);
 }
-

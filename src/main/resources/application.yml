@@ -5,6 +5,9 @@ api:
 server:
   port: 8080
 
+storage:
+  strategy: ${STORAGE_STRATEGY:memory} # Por defecto usa memory, pero puedes pasar 'redis'
+
 spring:
   application:
     name: mendel-challenge

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -33,55 +34,44 @@ public class TransactionController {
     @PutMapping("/transaction/{transaction_id}")
     public ResponseEntity<TransactionResponse> createTransaction(
             @PathVariable("transaction_id") Long transactionId,
-            @Valid @RequestBody TransactionRequest request,
-            @RequestParam(value = "storage", defaultValue = "memory") String storage) {
-
-        StorageStrategy strategy = StorageStrategy.fromString(storage);
+            @Valid @RequestBody TransactionRequest request) {
 
         Transaction transaction = transactionService.create(
                 transactionId,
                 request.type(),
                 request.amount(),
-                request.parentId(),
-                strategy
+                request.parentId()
         );
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(toResponse(transaction));
-    }
-
-    @GetMapping("/types/{type}")
-    public ResponseEntity<TypeTransactionsResponse> getTransactionsByType(
-            @PathVariable String type,
-            @RequestParam(value = "storage", defaultValue = "memory") String storage) {
-
-        StorageStrategy strategy = StorageStrategy.fromString(storage);
-
-        List<Long> transactionIds = transactionService.getByType(type, strategy)
-                .stream()
-                .map(Transaction::getId)
-                .toList();
-
-        TypeTransactionsResponse response = TypeTransactionsResponse.of(
-                type,
-                transactionIds,
-                strategy.getValue()
-        );
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(transaction));
     }
 
     @GetMapping("/sum/{transaction_id}")
     public ResponseEntity<SumResponse> getTransactionSum(
-            @PathVariable("transaction_id") Long transactionId,
-            @RequestParam(value = "storage", defaultValue = "memory") String storage) {
+            @PathVariable("transaction_id") Long transactionId) {
 
-        StorageStrategy strategy = StorageStrategy.fromString(storage);
-
-        var sum = transactionService.calculateSum(transactionId, strategy);
+        BigDecimal sum = transactionService.calculateSum(transactionId);
         return ResponseEntity.ok(new SumResponse(sum));
     }
+
+    @GetMapping("/types/{type}")
+    public ResponseEntity<TypeTransactionsResponse> getTransactionsByType(
+            @PathVariable String type) {
+
+        List<Long> transactionIds = transactionService.getByType(type)
+                .stream()
+                .map(Transaction::getId)
+                .toList();
+
+        // Si tu DTO TypeTransactionsResponse.of todavía requiere 3 parámetros:
+        TypeTransactionsResponse response = TypeTransactionsResponse.of(
+                type,
+                transactionIds,
+                "MANAGED_STORAGE"
+        );
+
+        return ResponseEntity.ok(response);
+    } // <-- Aquí solo debe ir UNA llave
 
     private TransactionResponse toResponse(Transaction transaction) {
         return new TransactionResponse(

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("redisRepository")
 @ConditionalOnProperty(name = "redis.enabled", havingValue = "true", matchIfMissing = true)
 public class RedisTransactionRepository implements TransactionRepository {
 
@@ -118,7 +117,6 @@ public class RedisTransactionRepository implements TransactionRepository {
         return Boolean.TRUE.equals(exists);
     }
 
-    @Override
     public String getImplementationType() {
         return "REDIS";
     }

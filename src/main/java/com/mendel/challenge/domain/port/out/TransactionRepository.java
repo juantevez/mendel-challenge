@@ -10,6 +10,4 @@ public interface TransactionRepository {
     List<Transaction> findByType(String type);
     List<Transaction> findChildrenOf(Long parentId);
     boolean existsById(Long id);
-
-    String getImplementationType();
 }

@@ -85,19 +85,6 @@ test-coverage-fast: ## Coverage solo de unitarios sin limpiar (más rápido)
 	$(MVN) test jacoco:report -P unit-tests
 	@echo "Coverage report: target/site/jacoco/index.html"
 
-test-performance: ## Ejecutar tests de performance
-	$(MVN) test -Dtest=TransactionRepositoryPerformanceTest
-
-test-load: ## Ejecutar tests de carga
-	$(MVN) test -Dtest=TransactionApiLoadTest
-
-test-stress: ## Ejecutar todos los stress tests
-	$(MVN) test -Dtest="*PerformanceTest,*LoadTest"
-
-performance-report: ## Generar reporte de performance
-	$(MVN) test -Dtest="*PerformanceTest,*LoadTest" surefire-report:report
-	@echo "Report: target/site/surefire-report.html"
-
 restart: down up ## Reiniciar servicios
 
 dev-up: ## Levantar solo Redis para desarrollo local
