@@ -27,48 +27,39 @@ El sistema implementa un servicio de gestión de transacciones con soporte para 
 ```
 ┌────────────────────────────────────────────────────────────────┐
 │                       APPLICATION LAYER                        │
-│  ┌──────────────────┐         ┌──────────────────────────┐     │
-│  │  REST Controller │ ◄────── │  DTOs & Mappers          │     │
-│  └────────┬─────────┘         └──────────────────────────┘     │
-└───────────┼────────────────────────────────────────────────────┘
-            │
-            │ uses
-            ▼
+│  ┌──────────────────────┐         ┌─────────────────────────┐  │
+│  │   REST Controller    │ ◄────── │  Requests / Responses   │  │
+│  │  (Inbound Adapter)   │         │     (Java Records)      │  │
+│  └──────────┬───────────┘         └─────────────────────────┘  │
+└─────────────┼──────────────────────────────────────────────────┘
+              │ 
+              ▼ calls (Input Port)
 ┌────────────────────────────────────────────────────────────────┐
 │                        DOMAIN LAYER                            │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │                   Business Logic                         │  │
-│  │  ┌───────────────┐      ┌───────────────────────────┐    │  │
-│  │  │ Transaction   │      │  TransactionService       │    │  │
-│  │  │ (Entity)      │      │  (Domain Service)         │    │  │
-│  │  └───────────────┘      └───────────────────────────┘    │  │
+│  │                  TransactionService                      │  │
+│  │                  (Business Logic)                        │  │
+│  └──────────────────────────┬───────────────────────────────┘  │
+│                             │                                  │
+│  ┌──────────────────────────▼───────────────────────────────┐  │
+│  │                TransactionRepository                     │  │
+│  │                   (Output Port)                          │  │
 │  └──────────────────────────────────────────────────────────┘  │
-│                                                                │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                     Ports (Interfaces)                   │  │
-│  │  ┌────────────────────┐  ┌──────────────────────────┐    │  │
-│  │  │  Input Ports       │  │  Output Ports            │    │  │
-│  │  │  (Use Cases)       │  │  (Repository Interface)  │    │  │
-│  │  └────────────────────┘  └──────────────────────────┘    │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└───────────────────────────┬────────────────────────────────────┘
-                            │
-                            │ implements
-                            ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   INFRASTRUCTURE LAYER                          │
-│  ┌──────────────────┐                  ┌──────────────────┐     │
-│  │  InMemory Repo   │                  │   Redis Repo     │     │
-│  │  (Adapter)       │                  │   (Adapter)      │     │
-│  └──────────────────┘                  └──────────────────┘     │
-│           ▲                                      ▲              │
-│           └──────────┬───────────────────────────┘              │
-│                      │                                          │
-│           ┌──────────▼────────────┐                             │
-│           │  Repository Factory   │                             │
-│           │  (Strategy Pattern)   │                             │
-│           └───────────────────────┘                             │
-└─────────────────────────────────────────────────────────────────┘
+└─────────────────────────────┬──────────────────────────────────┘
+                              │ 
+                              │ injected by Spring 
+                              ▼ (Based on @ConditionalOnProperty)
+┌───────────────────────────────────────────────────────────────────┐
+│                   INFRASTRUCTURE LAYER                            │
+│  ┌──────────────────────────┬───────────────────────────────┐     │
+│  │   RepositoryConfig       │ strategy: ${storage.strategy} │     │
+│  └──────────┬───────────────┴───────────────┬───────────────┘     │
+│             │                               │                     │
+│  ┌──────────▼────────────┐        ┌──────────▼──────────────┐     │
+│  │  InMemory Adapter     │        │     Redis Adapter       │     │
+│  │ (Map Implementation)  │        │ (RedisTemplate/Lettuce) │     │
+│  └───────────────────────┘        └─────────────────────────┘     │
+└───────────────────────────────────────────────────────────────────┘
 ```
 
 ## Capas del Sistema
@@ -80,7 +71,6 @@ El sistema implementa un servicio de gestión de transacciones con soporte para 
 domain/
 ├── model/
 │   ├── Transaction.java          # Entidad de dominio
-│   └── StorageStrategy.java      # Enum para estrategias
 ├── port/
 │   ├── in/                        # Input Ports (Use Cases)
 │   │   ├── CreateTransactionUseCase.java
@@ -131,8 +121,6 @@ infrastructure/
 │       ├── RedisTransactionRepository.java
 │       └── dto/
 │           └── TransactionRedisDTO.java
-├── factory/
-│   └── TransactionRepositoryFactory.java
 └── config/
     └── RedisConfig.java
 ```
@@ -141,7 +129,6 @@ infrastructure/
 -  **Adaptadores**: Implementan interfaces del dominio
 -  **Separación de concerns**: Cada adapter es independiente
 -  **DTO de persistencia**: TransactionRedisDTO para Redis
--  **Factory Pattern**: Selección dinámica de estrategia
 
 ## Patrones de Diseño
 
@@ -161,23 +148,6 @@ public class InMemoryTransactionRepository implements TransactionRepository {
 }
 ```
 
-### 2. Strategy Pattern
-```java
-public enum StorageStrategy {
-    IN_MEMORY, REDIS
-}
-
-@Component
-public class TransactionRepositoryFactory {
-    public TransactionRepository getRepository(StorageStrategy strategy) {
-        return switch (strategy) {
-            case IN_MEMORY -> inMemoryRepository;
-            case REDIS -> redisRepository;
-        };
-    }
-}
-```
-
 ### 3. Builder Pattern
 ```java
 Transaction transaction = Transaction.builder()
@@ -186,16 +156,6 @@ Transaction transaction = Transaction.builder()
     .amount(new BigDecimal("1000"))
     .parentId(null)
     .build();
-```
-
-### 4. Factory Pattern
-```java
-TransactionRepositoryFactory factory = new TransactionRepositoryFactory(
-    inMemoryRepo, 
-    Optional.of(redisRepo)
-);
-
-TransactionRepository repo = factory.getRepository(StorageStrategy.REDIS);
 ```
 
 ### 5. Repository Pattern
@@ -220,9 +180,6 @@ public class Transaction {
     private final Long parentId;        // ID del padre (opcional)
     private final Instant createdAt;    // Timestamp de creación
     
-    // Constructor privado + Builder
-    // Getters
-    // equals/hashCode basado en id
 }
 ```
 
@@ -363,13 +320,6 @@ Value: Set[2, 3]
 -  **Predictibilidad**: No hay efectos secundarios
 -  **Cache-friendly**: Ideal para Redis
 -  **DDD**: Entidades inmutables son más seguras
-
-### 4. ¿Por qué Factory Pattern para repositorios?
-
--  **Single Responsibility**: Factory solo crea repositorios
--  **Open/Closed**: Agregar estrategias sin modificar Factory
--  **Dependency Injection**: Compatible con Spring
--  **Strategy Pattern**: Complementa la selección de estrategia
 
 ### 5. ¿Por qué DTO separado para Redis?
 

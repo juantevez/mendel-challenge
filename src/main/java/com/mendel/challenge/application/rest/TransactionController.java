@@ -7,6 +7,7 @@ import com.mendel.challenge.application.dto.TypeTransactionsResponse;
 import com.mendel.challenge.domain.model.Transaction;
 import com.mendel.challenge.domain.service.TransactionService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/transactionservice")
+@Slf4j
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -34,41 +36,69 @@ public class TransactionController {
             @PathVariable("transaction_id") Long transactionId,
             @Valid @RequestBody TransactionRequest request) {
 
-        Transaction transaction = transactionService.create(
-                transactionId,
-                request.type(),
-                request.amount(),
-                request.parentId()
-        );
+        log.info("Creating transaction with id: {}, type: {}, amount: {}, parentId: {}",
+                transactionId, request.type(), request.amount(), request.parentId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(transaction));
+        try {
+            Transaction transaction = transactionService.create(
+                    transactionId,
+                    request.type(),
+                    request.amount(),
+                    request.parentId()
+            );
+
+            log.info("Transaction created successfully with id: {}", transactionId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(transaction));
+
+        } catch (Exception e) {
+            log.error("Error creating transaction with id: {}. Error: {}", transactionId, e.getMessage(), e);
+            throw e;
+        }
     }
 
     @GetMapping("/sum/{transaction_id}")
     public ResponseEntity<SumResponse> getTransactionSum(
             @PathVariable("transaction_id") Long transactionId) {
 
-        BigDecimal sum = transactionService.calculateSum(transactionId);
-        return ResponseEntity.ok(new SumResponse(sum));
+        log.info("Calculating sum for transaction id: {}", transactionId);
+
+        try {
+            BigDecimal sum = transactionService.calculateSum(transactionId);
+            log.info("Sum calculated successfully for transaction id: {}. Result: {}", transactionId, sum);
+            return ResponseEntity.ok(new SumResponse(sum));
+
+        } catch (Exception e) {
+            log.error("Error calculating sum for transaction id: {}. Error: {}", transactionId, e.getMessage(), e);
+            throw e;
+        }
     }
 
     @GetMapping("/types/{type}")
     public ResponseEntity<TypeTransactionsResponse> getTransactionsByType(
             @PathVariable String type) {
 
-        List<Long> transactionIds = transactionService.getByType(type)
-                .stream()
-                .map(Transaction::getId)
-                .toList();
+        log.info("Fetching transactions by type: {}", type);
 
-        // Si tu DTO TypeTransactionsResponse.of todavía requiere 3 parámetros:
-        TypeTransactionsResponse response = TypeTransactionsResponse.of(
-                type,
-                transactionIds,
-                "MANAGED_STORAGE"
-        );
+        try {
+            List<Long> transactionIds = transactionService.getByType(type)
+                    .stream()
+                    .map(Transaction::getId)
+                    .toList();
 
-        return ResponseEntity.ok(response);
+            log.info("Found {} transactions of type: {}", transactionIds.size(), type);
+
+            TypeTransactionsResponse response = TypeTransactionsResponse.of(
+                    type,
+                    transactionIds,
+                    "MANAGED_STORAGE"
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Error fetching transactions by type: {}. Error: {}", type, e.getMessage(), e);
+            throw e;
+        }
     }
 
     private TransactionResponse toResponse(Transaction transaction) {
