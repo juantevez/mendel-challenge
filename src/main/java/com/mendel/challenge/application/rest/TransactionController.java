@@ -4,7 +4,6 @@ import com.mendel.challenge.application.dto.SumResponse;
 import com.mendel.challenge.application.dto.TransactionRequest;
 import com.mendel.challenge.application.dto.TransactionResponse;
 import com.mendel.challenge.application.dto.TypeTransactionsResponse;
-import com.mendel.challenge.domain.model.StorageStrategy;
 import com.mendel.challenge.domain.model.Transaction;
 import com.mendel.challenge.domain.service.TransactionService;
 import jakarta.validation.Valid;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -71,7 +69,7 @@ public class TransactionController {
         );
 
         return ResponseEntity.ok(response);
-    } // <-- Aquí solo debe ir UNA llave
+    }
 
     private TransactionResponse toResponse(Transaction transaction) {
         return new TransactionResponse(

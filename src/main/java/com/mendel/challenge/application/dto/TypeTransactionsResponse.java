@@ -1,9 +1,7 @@
 package com.mendel.challenge.application.dto;
 
-import java.util.List;
-
-
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
