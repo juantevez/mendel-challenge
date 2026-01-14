@@ -127,41 +127,6 @@ curl http://localhost:8080/actuator/health
 ### ``` src/main/resources/postman/mendel-challenge-postman-collection.json ``` 
 
 
-
-##  Testing
-
-### Ejecutar todos los tests
-```bash
-./mvnw test
-```
-
-### Ejecutar tests con coverage
-```bash
-./mvnw clean test jacoco:report
-```
-
-El reporte se genera en: `target/site/jacoco/index.html`
-
-### Tests por clase
-```bash
-# Service tests
-./mvnw test -Dtest=TransactionServiceTest
-
-# Repository tests
-./mvnw test -Dtest=InMemoryTransactionRepositoryTest
-./mvnw test -Dtest=RedisTransactionRepositoryTest
-
-# Factory tests
-./mvnw test -Dtest=TransactionRepositoryFactoryTest
-```
-
-### Cobertura de tests
-
-- **TransactionService**: 100%
-- **InMemoryTransactionRepository**: 100%
-- **RedisTransactionRepository**: ~95%
-- **TransactionRepositoryFactory**: 100%
-
 ## Docker
 
 ### Comandos disponibles
@@ -177,6 +142,8 @@ make up
 
 # Ver logs
 make logs
+make logs-app
+make logs-redis
 
 # Detener servicios
 make down
